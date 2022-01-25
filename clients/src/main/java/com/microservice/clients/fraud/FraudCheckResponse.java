@@ -1,4 +1,4 @@
-package com.microservice.customer;
+package com.microservice.clients.fraud;
 
 public record FraudCheckResponse(Boolean isFraudster) {
 }
