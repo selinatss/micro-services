@@ -7,7 +7,7 @@ import com.microservice.clients.fraud.FraudCheckResponse;
 
 @Slf4j
 @RestController
-@RequestMapping("api/v1/fraud-check")
+@RequestMapping("/api/v1/fraud-check")
 @AllArgsConstructor
 public class FraudController {
     private final FraudCheckService fraudCheckService;

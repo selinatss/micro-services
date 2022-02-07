@@ -2,6 +2,8 @@ package com.microservice.customer;
 
 import com.microservice.clients.fraud.FraudCheckResponse;
 import com.microservice.clients.fraud.FraudClient;
+import com.microservice.clients.notification.NotificationClient;
+import com.microservice.clients.notification.NotificationRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -10,8 +12,8 @@ import org.springframework.web.client.RestTemplate;
 @AllArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRespository;
-    private final RestTemplate restTemplate;
     private final FraudClient fraudClient;
+    private final NotificationClient notificationClient;
 
     public void registerCustomer(CustomerRegistrationRequest customerRegistrationRequest){
         Customer customer = Customer.builder().firstName(customerRegistrationRequest.firstName())
@@ -32,6 +34,10 @@ public class CustomerService {
         }
 
         customerRespository.save(customer);
-        //todo: send notification
+
+        notificationClient.sendNotification(new NotificationRequest(
+                customer.getId(),
+                customer.getEmail(),
+                String.format("Hi there, I am selin", customer.getFirstName())));
     }
 }
