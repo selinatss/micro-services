@@ -1,5 +1,6 @@
 package com.microservice.customer;
 
+import com.microservice.amqp.RabbitMQMessageProducer;
 import com.microservice.clients.fraud.FraudCheckResponse;
 import com.microservice.clients.fraud.FraudClient;
 import com.microservice.clients.notification.NotificationClient;
@@ -13,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 public class CustomerService {
     private final CustomerRepository customerRespository;
     private final FraudClient fraudClient;
-    private final NotificationClient notificationClient;
+    private final RabbitMQMessageProducer rabbitMQMessageProducer;
 
     public void registerCustomer(CustomerRegistrationRequest customerRegistrationRequest){
         Customer customer = Customer.builder().firstName(customerRegistrationRequest.firstName())
@@ -35,9 +36,15 @@ public class CustomerService {
 
         customerRespository.save(customer);
 
-        notificationClient.sendNotification(new NotificationRequest(
+        NotificationRequest notificationRequest = new NotificationRequest(
                 customer.getId(),
                 customer.getEmail(),
-                String.format("Hi there, I am selin", customer.getFirstName())));
+                String.format("Hi there, I am selin", customer.getFirstName()));
+
+        rabbitMQMessageProducer.publish(
+                notificationRequest,
+                "internal.exchange",
+                "internal.notification.routing-key"
+        );
     }
 }
